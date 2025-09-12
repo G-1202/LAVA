@@ -1,4 +1,4 @@
-name: yolov8
+name: LAVA
 channels:
   - conda-forge
   - defaults
@@ -249,4 +249,3 @@ dependencies:
       - tzdata==2023.4
       - ultralytics-thop==0.2.7
       - urllib3==2.1.0
-prefix: /home/ubuntu/miniconda3/envs/yolov8
