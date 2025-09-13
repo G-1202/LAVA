@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 
 class ConvBN(nn.Sequential):
-    """基础卷积模块"""
+    """Basic convolution module"""
     def __init__(self, in_ch, out_ch, kernel_size, stride):
         padding = (kernel_size - 1) // 2
         super().__init__(
@@ -12,28 +12,28 @@ class ConvBN(nn.Sequential):
         )
 
 class UniversalInvertedBottleneck(nn.Module):
-    """通用逆残差模块"""
+    """Universal inverse residual module"""
     def __init__(self, inp, oup, start_dw_kernel, middle_dw_kernel, middle_downsample, stride, expand_ratio):
         super().__init__()
         self.stride = stride
 
-        # 起始深度卷积
+        # Initial depth convolution
         self.start_dw = None
         if start_dw_kernel > 0:
             self.start_dw = ConvBN(inp, inp, start_dw_kernel,
                                    stride if not middle_downsample else 1)
 
-        # 扩展阶段
+        # Expansion stage
         hidden_dim = int(inp * expand_ratio)
         self.expand = ConvBN(inp, hidden_dim, 1, 1)
 
-        # 中间深度卷积
+        # Intermediate depth convolution
         self.middle_dw = None
         if middle_dw_kernel > 0:
             dw_stride = stride if middle_downsample else 1
             self.middle_dw = ConvBN(hidden_dim, hidden_dim, middle_dw_kernel, dw_stride)
 
-        # 投影阶段
+        # Projection stage
         self.project = nn.Sequential(
             nn.Conv2d(hidden_dim, oup, 1, 1, 0, bias=False),
             nn.BatchNorm2d(oup)
@@ -57,17 +57,17 @@ class UniversalInvertedBottleneck(nn.Module):
 class MNV4ConvSmall(nn.Module):
     def __init__(self, width_mult=1.0, expand_ratio_scale=0.8):
         super().__init__()
-        # 基础通道配置
+        # Basic channel configuration
         channels = {
             'conv0': int(32 * width_mult),
             'layer1': int(32 * width_mult),
             'layer2': int(64 * width_mult),
             'layer3': int(96 * width_mult),
             'layer4': int(128 * width_mult),
-            'output': 576  # 调整为与原V3对齐
+            'output': 576
         }
 
-        # 调整扩展比
+        # Adjust expansion ratio
         expand_ratios = [
             3 * expand_ratio_scale,  # 3→2.4
             2 * expand_ratio_scale,  # 2→1.6
@@ -78,34 +78,25 @@ class MNV4ConvSmall(nn.Module):
             # conv0
             ConvBN(3, channels['conv0'], 3, 2),
 
-            # layer1 (减少模块数量)
+            # layer1
             ConvBN(channels['conv0'], channels['layer1'], 3, 2),
             ConvBN(channels['layer1'], channels['layer1'], 1, 1),
 
             # layer2
             ConvBN(channels['layer1'], channels['layer2'], 3, 2),
-            ConvBN(channels['layer2'], channels['layer2'] // 2, 1, 1),  # 通道减半
+            ConvBN(channels['layer2'], channels['layer2'] // 2, 1, 1),
 
-            # layer3 (2个UIB模块)
+            # layer3
             UniversalInvertedBottleneck(channels['layer2'] // 2, channels['layer3'], 5, 5, True, 2, expand_ratios[0]),
             UniversalInvertedBottleneck(channels['layer3'], channels['layer3'], 0, 3, True, 1, expand_ratios[1]),
 
-            # layer4 (4个UIB模块)
+            # layer4
             UniversalInvertedBottleneck(channels['layer3'], channels['layer4'], 3, 3, True, 2, expand_ratios[2]),
             UniversalInvertedBottleneck(channels['layer4'], channels['layer4'], 0, 3, True, 1, expand_ratios[1]),
 
-            # 输出层
             ConvBN(channels['layer4'], channels['output'], 1, 1),
             nn.AdaptiveAvgPool2d(1)
         )
 
     def forward(self, x):
         return self.features(x).flatten(1)
-
-
-# if __name__ == "__main__":
-#     model = MNV4ConvSmall(width_mult=0.75, expand_ratio_scale=0.8)
-#     # 测试前向传播
-#     input_tensor = torch.randn(3, 3, 224, 224)
-#     output = model(input_tensor)
-#     print("输出形状:", output.shape)  # torch.Size([3, 576])
