@@ -229,7 +229,6 @@ def base_label(folder_path):
     txt_files = sorted([f for f in os.listdir(folder_path) if f.endswith('.txt')])
     for file_name in txt_files:
         file_path = os.path.join(folder_path, file_name)
-        # 打开文件
         with open(file_path, 'r') as file:
             lines = file.readlines()
         column_to_delete = 1
@@ -325,3 +324,4 @@ def calculate_offsets(boxes1, boxes2):
     else:
         mean_offset = sum(offsets)/len(offsets)
     return mean_offset
+
