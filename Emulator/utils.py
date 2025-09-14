@@ -5,6 +5,8 @@ import cv2
 import math
 from collections import defaultdict
 import torch
+from ultralytics import YOLO
+import subprocess
 
 
 def load_trace(trace_folder):
@@ -229,6 +231,7 @@ def base_label(folder_path):
     txt_files = sorted([f for f in os.listdir(folder_path) if f.endswith('.txt')])
     for file_name in txt_files:
         file_path = os.path.join(folder_path, file_name)
+        # 打开文件
         with open(file_path, 'r') as file:
             lines = file.readlines()
         column_to_delete = 1
@@ -325,3 +328,142 @@ def calculate_offsets(boxes1, boxes2):
         mean_offset = sum(offsets)/len(offsets)
     return mean_offset
 
+
+def size_and_offset(name, num):
+    source = f'input/{name}/{num}'
+    files = sorted(os.listdir(source), key=lambda x: int(x.split('.')[0]))
+    num_frames = len(files)
+    small, mid, large = 0, 0, 0
+    move = []
+
+    for idx, file in enumerate(files):
+        path = os.path.join(source, file)
+        if os.stat(path).st_size != 0:
+            boxes = np.loadtxt(path, delimiter=' ', usecols=[2, 3, 4, 5])
+            # Calculate areas and categorize
+            areas = calculate_normalized_areas(boxes, 3840, 2160)
+            small_threshold = 0.005
+            medium_threshold = 0.03
+
+            small = small + np.sum(areas <= small_threshold)
+            mid = mid + np.sum((areas > small_threshold) & (areas <= medium_threshold))
+            large = large + np.sum(areas > medium_threshold)
+
+            if idx < num_frames-1 and os.stat(f'input/{name}/{num}/{num}_{idx+2}.txt').st_size != 0:
+                boxes_frame1 = load_boxes(f'input/{name}/{num}/{num}_{idx + 1}.txt')
+                boxes_frame2 = load_boxes(f'input/{name}/{num}/{num}_{idx + 2}.txt')
+                if calculate_offsets(boxes_frame1, boxes_frame2) != 0:
+                    move.append(calculate_offsets(boxes_frame1, boxes_frame2))
+    all = small + mid + large
+    # small, mid, large = small / num_frames, mid / num_frames, large / num_frames
+    if all == 0:
+        return 0, 0, 0, 0
+    radio_samll = small/all
+    radio_mid = mid/all
+    radio_large = large/all
+    if len(move) != 0:
+        move = sum(move)/len(move)
+    else:
+        move = 10
+    return radio_samll, radio_mid, radio_large, move
+
+
+def frame_skip(source_folder, target_folder, skip):
+    if os.path.isdir(target_folder):
+        shutil.rmtree(target_folder)
+    os.makedirs(target_folder, exist_ok=True)
+    images = sorted([f for f in os.listdir(source_folder) if f.endswith('.jpg')])
+    target_index = 0
+    for i in range(0, len(images), skip + 1):
+        src_img = images[i]
+        dst_img = f'{target_index:02d}.jpg'
+        shutil.copy(os.path.join(source_folder, src_img), os.path.join(target_folder, dst_img))
+        target_index += 1
+    return target_index
+
+
+def encoder(image_folder, video_name, bit, w, h, l, fps):
+    directory = os.path.dirname(video_name)
+    if not os.path.exists(directory):
+        os.makedirs(directory)
+    input_path = os.path.join(image_folder, '%02d.jpg')
+    ffmpeg_cmd = [
+        'ffmpeg',
+        '-y',
+        '-framerate', str(fps),
+        '-i', input_path,
+        '-c:v', 'libx264',
+        '-b:v', f'{bit:.2f}k',
+        '-s', f'{w}x{h}',
+        '-t', f'{l}',
+        video_name
+    ]
+    subprocess.run(ffmpeg_cmd, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+
+
+def detect_data(video_name, output_folder, num, frame):
+    if os.path.isdir(f'runs/detect/{output_folder}/{num}'):
+        shutil.rmtree(f'runs/detect/{output_folder}/{num}')
+    if os.path.isdir(f'input/{output_folder}/{num}'):
+        shutil.rmtree(f'input/{output_folder}/{num}')
+    """
+        Choose the appropriate inference model.
+    """
+    yolo = YOLO('inference_model/AD&TC.pt', task="detect")
+    yolo(source=video_name, save_txt=True, save_conf=True, name=f'{output_folder}/{num}')
+    new_p = f'input/{output_folder}/{num}'
+    folder = os.path.exists(new_p)
+    if not folder:
+        os.makedirs(new_p)
+    format_conversion(f'runs/detect/{output_folder}/{num}/labels', f'{new_p}/', 3840, 2160)
+    parent_directory = f'input/{output_folder}'
+    rewrite(parent_directory, num, frame)
+
+
+def extract_last_frame(video_name, index, j, m, n, frame_path):
+    cap = cv2.VideoCapture(video_name)
+    if not cap.isOpened():
+        print(f"Error: Unable to open video file {video_name}.")
+        return
+    frame_count = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+    if frame_count <= 0:
+        print("Error: Video frame rate acquisition failed.")
+        cap.release()
+        return
+    cap.set(cv2.CAP_PROP_POS_FRAMES, frame_count - 1)
+    ret, frame = cap.read()
+    if not ret:
+        print("Error: Unable to read the last frame.")
+        cap.release()
+        return
+
+    file_name = f"{index}_{j * 16 + m * 4 + n}.jpg"
+    save_file = os.path.join(frame_path, file_name)
+    cv2.imwrite(save_file, frame)
+    cap.release()
+
+"""
+        Related tests.
+"""
+# if __name__ == '__main__':
+#     VIDEO_BIT_RATE = [12000, 10000, 8600, 6500, 5000, 3300, 2200, 1200, 800, 400, 200]
+#     RE = [[1920, 1080], [1280, 720], [720, 480], [320, 240]]
+#     SKIP = [0, 1, 2, 5]
+#     FPS = 30
+#     Length = 2
+#
+#     # Save the original video frames in 'dataset/AD'.
+#     FRAMES = 'dataset/AD'
+#     video_path = f'dataset/video_AD'
+#     frame_path = f'dataset/AD_frames'
+#
+#     # Assuming the encoding parameters are 6500Kbps, 720p, 15fps
+#     frames = frame_skip(f'{FRAMES}/1', f'dataset/AD_seg/1', SKIP[1])
+#
+#     # encode
+#     encoder(f'dataset/AD/1', f'{video_path}/1.mp4', VIDEO_BIT_RATE[3], RE[1][0], RE[1][1], Length, FPS / (SKIP[1] + 1))
+#     extract_last_frame(f'{video_path}/1.mp4', 1, 3, 1, 1, frame_path)
+#
+#     # Perform video inference, calculate movement distance and object proportion.
+#     detect_data(f'{video_path}/1.mp4', 'AD', 1, math.floor(60 / (SKIP[1] + 1)))
+#     small, mid, large, move = size_and_offset('AD', 1)
