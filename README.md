@@ -1,22 +1,33 @@
 # LAVA
+
 LAVA (Latency Adaptive Video Analytics) is a framework that enforces strict latency bounds while maintaining the inference accuracy through fine-grained encoding parameter adaptation.
 
 ## Environmental Instructions:
 
 The `LAVA_environment.yml` file defines a Conda environment named `LAVA`. This environment is built for Linux-64 systems that support GPU (CUDA).
 It includes the following key components:
+1. Python: 3.8.18
+2. PyTorch: 2.1.2 (with CUDA 12 support via nvidia-cuda* and nvidia-cudnn-cu12 packages)
+3. TorchVision: 0.16.2
+4. Ultralytics YOLOv8: 8.2.52
+5. OpenCV: 4.9.0.80 (via opencv-python) and base lib 4.6.0
 
-Python: 3.8.18
+## Emulator:
 
-PyTorch: 2.1.2 (with CUDA 12 support via nvidia-cuda* and nvidia-cudnn-cu12 packages)
+We developed a data-driven emulator. In `Emulator/dataset/`, `4G.txt` is the TCP throughput trace data. `AD.H5` is the processed video (20 minutes) data file, which stores a series of information for each video segment under different encoding parameters. Inference models are in `Emulator/inference_model/`.
+1. Download `AD_frames.zip` and extract it to the `Emulator/dataset/` path.
+2. Under `Emulator`, run `test_optimization.py`.
 
-TorchVision: 0.16.2
+Tips: You can create data files based on your own dataset, and there are related processing functions in the `utils.py`. At the same time, it supports the construction of an online full process system.
 
-Ultralytics YOLOv8: 8.2.52
+## Video Size Predictor:
+Contains pre trained model.
 
-OpenCV: 4.9.0.80 (via opencv-python) and base lib 4.6.0
+## Inference Accuracy Predictor:
+Contains pre trained model.
 
-## Video sources:
+## Video Sources:
+
 Autonomous Driving (AD): https://www.youtube.com/watch?v=dIHYeTVklu4
 
 Traffic Congestion (TC): https://www.youtube.com/watch?v=59c6yIYIys8
