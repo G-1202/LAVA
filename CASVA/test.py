@@ -89,7 +89,7 @@ def valid(shared_model, epoch, log_file):
     torch.save(shared_model.state_dict(), model_save_path)
 
 
-def test(test_model, start, chunk, total, chunk_start):
+def test(test_model, start=0, chunk=600, total=600, chunk_start=0):
     model = Actor().type(dtype)
     model.eval()
     model.load_state_dict(torch.load(test_model))
@@ -129,4 +129,5 @@ def test(test_model, start, chunk, total, chunk_start):
 
         if end_of_video:
             return (env.F1, env.lag, env.bw_use, env.Reward, cooked_name,
+
                     env.lag_1, env.lag_2, env.lag_3, env.lag_4, env.lag_5)
