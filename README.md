@@ -12,17 +12,24 @@ It includes the following key components:
 4. Ultralytics YOLOv8: 8.2.52
 5. OpenCV: 4.9.0.80 (via opencv-python) and base lib 4.6.0
 
-
 ## Emulator:
 
 We developed a data-driven emulator. In `dataset/`, `4G.txt` is the TCP throughput trace data. `AD.H5` is the processed video (20 minutes) data file, which stores a series of information for each video segment under different encoding parameters. Inference models are in `inference_model/`.
 Download `AD_frames.zip` and extract it to the `dataset/` path.
 
-## Video Size Predictor:
-Contains pre trained model.
+Under `LAVA`, run `main.py`.
 
-## Inference Accuracy Predictor:
-Contains pre trained model.
+## Key Modules:
+
+1. Throughput Predictor: The complete version and related variants can be found in `Throughput_Predictor.py`.
+
+2. Video Size Predictor: Includes network structure, training settings, and pretrained models.
+
+3. Inference Accuracy Predictor: Includes network structure, training settings, and pretrained models.
+
+4. Online Optimization: In `main.py`.
+
+Tips: You can create data files based on your own dataset, and there are related processing functions in the `utils.py`. At the same time, it supports the construction of an online full process system.
 
 ## Video Sources:
 
