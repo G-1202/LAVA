@@ -12,14 +12,6 @@ It includes the following key components:
 4. Ultralytics YOLOv8: 8.2.52
 5. OpenCV: 4.9.0.80 (via opencv-python) and base lib 4.6.0
 
-## Emulator:
-
-We developed a data-driven emulator. In `Emulator/dataset/`, `4G.txt` is the TCP throughput trace data. `AD.H5` is the processed video (20 minutes) data file, which stores a series of information for each video segment under different encoding parameters. Inference models are in `Emulator/inference_model/`.
-1. Download `AD_frames.zip` and extract it to the `Emulator/dataset/` path.
-2. Under `Emulator`, run `test_optimization.py`.
-
-Tips: You can create data files based on your own dataset, and there are related processing functions in the `utils.py`. At the same time, it supports the construction of an online full process system.
-
 ## Video Size Predictor:
 Contains pre trained model.
 
@@ -29,6 +21,8 @@ Contains pre trained model.
 ## Video Sources:
 
 Autonomous Driving (AD): https://www.youtube.com/watch?v=dIHYeTVklu4
+
+Industrial Safety (IS): https://www.youtube.com/watch?v=vOG1Sm58NFc and https://www.youtube.com/watch?v=lfoTLeFooR4
 
 Traffic Congestion (TC): https://www.youtube.com/watch?v=59c6yIYIys8
 
