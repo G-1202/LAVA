@@ -14,7 +14,11 @@ It includes the following key components:
 
 ## Emulator:
 
-We developed a data-driven emulator. In `dataset/`, `4G.txt` is the TCP throughput trace data. `AD.H5` is the processed video (20 minutes) data file, which stores a series of information for each video segment under different encoding parameters. Inference models are in `inference_model/`.
+We developed a data-driven emulator. In `dataset/`, `4G.txt` is the TCP throughput trace data. 
+`AD.H5` is the processed video (20 minutes) data file, which stores a series of information for each video segment under different encoding parameters (Bitrate, resolution, and frame rate). 
+`AD_QP.H5` is data encoded using QP, resolution, and frame rate.
+Inference models are in `inference_model/`.
+
 Download `AD_frames.zip` and extract it to the `dataset/` path.
 
 Under `LAVA`, run `main.py`.
