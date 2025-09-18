@@ -5,10 +5,10 @@ import math
     TP is the complete version of the throughput predictor, while b1~b3 are variants.
 """
 
-def b_1(bw):
+def b1(bw):
     return np.mean(bw)
 
-def b_2(bw, timestamps, current_time, lambda_decay=0.2):
+def b2(bw, timestamps, current_time, lambda_decay=0.2):
     intervals = np.array([current_time - ts for ts in timestamps])
     bw_array = np.array(bw)
     weights = np.exp(-lambda_decay * intervals)
@@ -17,7 +17,7 @@ def b_2(bw, timestamps, current_time, lambda_decay=0.2):
     bw_est = prior_mean
     return bw_est
 
-def b_3(bw, transfer_times, timestamps, current_time, lambda_decay=0.2):
+def b3(bw, transfer_times, timestamps, current_time, lambda_decay=0.2):
     intervals = np.array([current_time - ts for ts in timestamps])
     bw_array = np.array(bw)
     transfer_times_array = np.array(transfer_times)
@@ -45,5 +45,6 @@ def TP(bw, transfer_times, timestamps, current_time, lambda_decay=0.2, theta=0.5
     b_min = min(recent_throughputs)
     if math.sqrt(observed_variance)/observed_mean > theta:
         bw_est = min(b_min, bw_est)
+
 
     return bw_est
