@@ -23,26 +23,36 @@ Inference models are in `inference_model/`.
 
 Download `AD_frames.zip` and extract it to the `dataset/` path.
 
-Under `LAVA`, run 
-
-`python main.py`.
-
-## Key Modules:
-
-1. Throughput Predictor: The complete version and related variants can be found in `Throughput_Predictor.py`.
-
-2. Video Size Predictor: Includes network structure, training settings, and pretrained models.
-
-3. Inference Accuracy Predictor: Includes network structure, training settings, and pretrained models.
-
-4. Online Optimization: In `main.py`.
+Under `LAVA`, run `python main.py`.
 
 Tips: You can create data files based on your own dataset, and there are related processing functions in the `utils.py`. At the same time, it supports the construction of an online full process system.
 
-## Performance Evaluation:
-Under `Results/`, run 
+## Key Modules:
 
-`python plot_results.py`.
+### Throughput Predictor: 
+The complete version and related variants can be found in `Throughput_Predictor.py`.
+
+### Video Size Predictor: 
+Includes network structure, training settings, and pretrained models.
+
+### Inference Accuracy Predictor: 
+Includes network structure, training settings, and pretrained models.
+
+### Online Optimization: 
+In `main.py`.
+
+## Ablation experiment：
+
+### About three modules: 
+
+Select `b1` in `Throughput_Predictor.py` to test the effect of without throughput prediction.
+
+Run `python wo_VP.py` to test the effect of without video size prediction.
+
+Run `python wo_AP.py` to test the effect of without inference accuracy prediction.
+
+## Performance Evaluation:
+Under ```Results/```, run ```python plot_results.py```.
 
 ![Latency-accuracy trade-off](Results/F_1.png)
 
