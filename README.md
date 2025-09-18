@@ -23,7 +23,9 @@ Inference models are in `inference_model/`.
 
 Download `AD_frames.zip` and extract it to the `dataset/` path.
 
-Under `LAVA`, run `python main.py`.
+Under `LAVA`, run 
+
+`python main.py`.
 
 ## Key Modules:
 
@@ -38,7 +40,9 @@ Under `LAVA`, run `python main.py`.
 Tips: You can create data files based on your own dataset, and there are related processing functions in the `utils.py`. At the same time, it supports the construction of an online full process system.
 
 ## Performance Evaluation:
-Under ```Results/```, run ```python plot_results.py```.
+Under `Results/`, run 
+
+`python plot_results.py`.
 
 ![Latency-accuracy trade-off](Results/F_1.png)
 
