@@ -2,6 +2,8 @@
 
 LAVA (Latency Adaptive Video Analytics) is a framework that enforces strict latency bounds while maintaining the inference accuracy through fine-grained encoding parameter adaptation.
 
+![Structure](Results/structure.svg)
+
 ## Environmental Instructions:
 
 The `LAVA_environment.yml` file defines a Conda environment named `LAVA`. This environment is built for Linux-64 systems that support GPU (CUDA).
@@ -21,7 +23,7 @@ Inference models are in `inference_model/`.
 
 Download `AD_frames.zip` and extract it to the `dataset/` path.
 
-Under `LAVA`, run `main.py`.
+Under `LAVA`, run `python main.py`.
 
 ## Key Modules:
 
@@ -34,6 +36,11 @@ Under `LAVA`, run `main.py`.
 4. Online Optimization: In `main.py`.
 
 Tips: You can create data files based on your own dataset, and there are related processing functions in the `utils.py`. At the same time, it supports the construction of an online full process system.
+
+## Performance Evaluation:
+Under ```Results/```, run ```python plot_results.py```.
+
+![Latency-accuracy trade-off](Results/F_1.svg)
 
 ## Video Sources:
 
