@@ -3,7 +3,7 @@ import pandas as pd
 import math
 import os
 import cv2
-from Throughput_Predictor import TP, b_3
+from Throughput_Predictor import TP, b3
 
 TOTAL = 600
 
@@ -237,4 +237,5 @@ def probe(bw):
     probe_packet_size = 1500
     probe_duration = probe_packet_size / (bw * 1000)
     probe_bw = probe_packet_size / (probe_duration * 125)
+
     return probe_bw, probe_duration
