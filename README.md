@@ -45,11 +45,17 @@ In `main.py`.
 
 ### About three modules: 
 
-Select `b1` in `Throughput_Predictor.py` to test the effect of without throughput prediction.
+Select `b1` in `Throughput_Predictor.py` to test the effect of without Throughput Predictor.
 
-Run `python wo_VP.py` to test the effect of without video size prediction.
+Run `python wo_VP.py` to test the effect of without Video Size Predictor.
 
-Run `python wo_AP.py` to test the effect of without inference accuracy prediction.
+Run `python wo_AP.py` to test the effect of without Inference Accuracy Predictor.
+
+### Fine-grained ablation study:
+
+Throughput Predictor: There are different optional weight functions in `Throughput_Predictor.py`.
+
+Video Size Predictor and Inference Accuracy Predictor: In the `network.py`, adjust the input of the FeatureExtractor to test the contribution of different information.
 
 ## Performance Evaluation:
 Under ```Results/```, run ```python plot_results.py```.
