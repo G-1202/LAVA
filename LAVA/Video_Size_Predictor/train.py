@@ -46,14 +46,14 @@ class VideoDataset(Dataset):
         """
             Returns the idx-th training sample.
 
-            Return format: (Temporal_features, accuracy_labels)
+            Return format: (Temporal_features, Size_labels)
             - Temporal_features: Tensor with shape [input_steps, 7]
-            - accuracy_labels: Tensor with shape [176]
+            - Size_labels: Tensor with shape [176]
         """
         # Core algorithm implementation details are withheld
         # Complete code will be released upon paper acceptance
-        X1, Y = self._generate_sample(idx)
-        return X1, Y
+        X1, S = self._generate_sample(idx)
+        return X1, S
 
 class EarlyStopper:
     def __init__(self, patience=5, min_delta=0, mode='min'):
@@ -140,4 +140,5 @@ if __name__ == '__main__':
             print(f"Early stopping triggered at epoch {epoch + 1}")
             break
     log_file.close()
+
 
