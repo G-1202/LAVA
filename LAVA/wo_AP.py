@@ -74,7 +74,7 @@ def wo_AP(S_l, M_l, L_l, Mo_l, con_l, r, wait):
     X3 = X3.to(device)
     with torch.no_grad():
         sample_X3 = X3.unsqueeze(0)
-        outputs_2 = beta_model(sample_X3)
+        outputs_2 = v_model(sample_X3)
     Y2_pred = outputs_2.squeeze().cpu().numpy()
     prediction = []
     for knob in range(len(Y2_pred)):
@@ -124,4 +124,5 @@ if __name__ == '__main__':
     with open(f'{output_dir}', 'w') as f:
         for i in range(len(F1)):
             f.write(f"{F1[i]} {lag[i]} {lag_1[i]} {lag_2[i]} {lag_3[i]} {lag_4[i]} {lag_5[i]}\n")
+
 
