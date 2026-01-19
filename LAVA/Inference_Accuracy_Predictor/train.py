@@ -47,40 +47,17 @@ class VideoDataset(Dataset):
         return self.num
 
     def __getitem__(self, idx):
-        rng = np.random.RandomState(self.seed + idx)
-        start_chunk = rng.randint(0, self.len - self.input_steps)
-        X1 = []
-        vf_img = None
-        for i in range(self.input_steps):
-            bit = np.random.randint(11)
-            skip = np.random.randint(4)
-            re = np.random.randint(4)
-            x = self.df.loc[(start_chunk+i, bit, skip, re), ['Small', 'Mid', 'Large', 'Move']].values.tolist()
-            x.append(bit)
-            x.append(skip)
-            x.append(re)
-            X1.append(x)
+        """
+            Returns the idx-th training sample.
 
-            if i == self.input_steps - 1:
-                file_name = f"{start_chunk + i + 1}_{bit * 16 + skip * 4 + re}.jpg"
-                image_path = os.path.join(frame_path, f"frame_{self.name}", file_name)
-                img = cv2.imread(image_path)
-                if img is None:
-                    raise FileNotFoundError(f"Unable to read image file: {image_path}")
-                img = cv2.resize(img, (224, 224))
-                img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-                img_proc = img_rgb.astype(np.float32) / 255.0
-                vf_img = torch.tensor(img_proc, dtype=torch.float32).permute(2, 0, 1)
-
-        X1 = torch.tensor(X1, dtype=torch.float32)
-        Y = []
-        for i in range(self.input_steps, self.input_steps + 1):
-            for bit in range(11):
-                for skip in range(4):
-                    for re in range(4):
-                        y = self.df.loc[(start_chunk + i, bit, skip, re), 'Accuracy']
-                        Y.append(y)
-        Y = torch.tensor(Y, dtype=torch.float32)
+            Return format: (Temporal_features, visual_features, accuracy_labels)
+            - Temporal_features: Tensor with shape [input_steps, 7]
+            - visual_features: Image tensor with shape [3, 224, 224]
+            - accuracy_labels: Tensor with shape [176]
+        """
+        # Core algorithm implementation details are withheld
+        # Complete code will be released upon paper acceptance
+        X1, vf_img, Y = self._generate_sample(idx)
         return X1, vf_img, Y
 
 class EarlyStopper:
@@ -168,4 +145,5 @@ if __name__ == '__main__':
         if early_stopper(val):
             print(f"Early stopping triggered at epoch {epoch + 1}")
             break
+
     log_file.close()
