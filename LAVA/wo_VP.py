@@ -58,30 +58,16 @@ def test(TL, tao, start, chunk_start, lambda_decay=0.2, theta=0.5):
 
 
 def wo_VP(S_l, M_l, L_l, Mo_l, fr, con_l, r, wait):
-    combined = []
-    for i in range(8):
-        combined.append([S_l[i], M_l[i], L_l[i], Mo_l[i], con_l[i][0], con_l[i][1], con_l[i][2]])
-    X2 = np.array(fr)
-    X2 = torch.tensor(X2, dtype=torch.float32).permute(2, 0, 1)
-    X2 = X2.to(device)
-
-    X3 = torch.tensor(con_l[-1], dtype=torch.float32)
-    X3 = X3.to(device)
-
-    with torch.no_grad():
-        sample_X2 = X2.unsqueeze(0)
-        sample_X3 = X3.unsqueeze(0)
-        outputs_1 = i_model(sample_X2, sample_X3)
-    Y1_pred = outputs_1.squeeze().cpu().numpy()
     prediction = []
-    for knob in range(len(Y1_pred)):
-        a = to_k(knob)
-        code_t = mean_time_list[knob]
-        prediction.append(
-            [a, # config
-             Y1_pred[knob], # accuracy
-             code_t + (2 * REAL[a[0]] / r) + wait, # latency
-             REAL[a[0]] / 1000]) # bw usage
+    """
+        Integrates multiple input streams and uses trained models to predict
+        accuracy, latency, and bandwidth usage across different configurations.
+
+        Returns:
+            list: Predictions for each configuration knob.
+    """
+    # Core algorithm implementation details are withheld
+    # Complete code will be released upon paper acceptance
     return prediction
 
 
@@ -121,5 +107,6 @@ if __name__ == '__main__':
     with open(f'{output_dir}', 'w') as f:
         for i in range(len(F1)):
             f.write(f"{F1[i]} {lag[i]} {lag_1[i]} {lag_2[i]} {lag_3[i]} {lag_4[i]} {lag_5[i]}\n")
+
 
 
