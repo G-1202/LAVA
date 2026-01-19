@@ -82,7 +82,7 @@ def wo_VP(S_l, M_l, L_l, Mo_l, fr, con_l, r, wait):
              Y1_pred[knob], # accuracy
              code_t + (2 * REAL[a[0]] / r) + wait, # latency
              REAL[a[0]] / 1000]) # bw usage
-    return prediction, Y1_pred, Y2_pred
+    return prediction
 
 
 def to_k(knob):
@@ -121,4 +121,5 @@ if __name__ == '__main__':
     with open(f'{output_dir}', 'w') as f:
         for i in range(len(F1)):
             f.write(f"{F1[i]} {lag[i]} {lag_1[i]} {lag_2[i]} {lag_3[i]} {lag_4[i]} {lag_5[i]}\n")
+
 
