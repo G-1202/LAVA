@@ -74,5 +74,5 @@ Street Facility (SF): https://drive.google.com/drive/folders/1SkogSHAO80lrMThizn
 
 ##
 
-This code is released in conjunction with a manuscript currently under peer review. It is provided to substantiate the key findings but is not the final, fully-featured version. We anticipate releasing the complete codebase upon acceptance.
+Note: This code is released in conjunction with a manuscript currently under peer review. It is provided to substantiate the key findings but is not the final, fully-featured version. We anticipate releasing the complete codebase upon acceptance.
 
